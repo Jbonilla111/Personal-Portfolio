@@ -1,0 +1,606 @@
+
+
+:root{
+	--bg: #0f1724; /* dark blue-gray */
+	--card: #0b1220;
+	--muted: #94a3b8;
+	--accent: #7c3aed; /* violet */
+	--accent-2: #06b6d4; /* teal */
+	--text: #e6eef8;
+	--glass: rgba(255,255,255,0.04);
+	--radius: 10px;
+	--container: 1100px;
+	--gap: 1.25rem;
+	font-synthesis: none;
+}
+
+/* Reset + sensible defaults */
+*{box-sizing:border-box}
+html,body{height:100%}
+html{font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
+body{
+	margin:0;
+	background: linear-gradient(180deg, var(--bg) 0%, #071025 100%);
+	color:var(--text);
+	line-height:1.5;
+	-webkit-font-feature-settings: "kern" 1;
+	font-feature-settings: "kern" 1;
+}
+
+/* Soft glowy backdrop behind the page content */
+body::before{
+	content: "";
+	position: fixed;
+	/* extend beyond the viewport so the glow wraps edges */
+	inset: -18%;
+	z-index: -1; /* behind content */
+	pointer-events: none;
+	transform: translateZ(0);
+	background:
+		radial-gradient(600px 420px at 10% 18%, rgba(124,58,237,0.18) 0%, rgba(124,58,237,0.08) 30%, transparent 60%),
+		radial-gradient(520px 380px at 86% 82%, rgba(6,182,212,0.14) 0%, rgba(6,182,212,0.06) 28%, transparent 62%);
+	filter: blur(56px);
+	mix-blend-mode: screen;
+	transition: opacity 400ms ease;
+	opacity: 1;
+}
+
+/* Respect reduced motion / reduce effects for accessibility */
+@media (prefers-reduced-motion: reduce){
+	body::before{opacity:0;display:none}
+}
+
+img{max-width:100%;display:block}
+a{color:var(--accent);text-decoration:none}
+a:focus{outline:3px solid color-mix(in srgb, var(--accent) 20%, transparent);outline-offset:3px}
+
+.container{width:100%;max-width:var(--container);margin:0 auto;padding:0 1rem}
+
+/* Header / nav */
+header{backdrop-filter: blur(6px);position:sticky;top:0;z-index:40}
+/* header layout: brand left, links right, centered by .container */
+header nav{
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	padding:0.75rem 0;
+	flex-wrap:nowrap;
+	gap: 2rem;
+}
+.brand{flex:0 0 auto}
+.nav-links{display:flex;gap:2rem;align-items:center;flex-shrink:0}
+/* brand has its own style; nav link styles target .nav-links */
+/* Animated brand (starfield + glow) adapted from StealthWorm */
+.brand{
+	position:relative;
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	padding:0.35rem 0.9rem;
+	height:2.4rem;
+	overflow:hidden;
+	border-radius:999px;
+	background-size:300% 300%;
+	transition:transform 0.5s, border 0.2s;
+	animation: gradient_301 5s ease infinite;
+	border: double 3px transparent;
+	background-image: linear-gradient(#121212,#121212), linear-gradient(137.48deg, #ffdb3b 10%, #fe53bb 45%, #8f51ea 67%, #06b6d4 87%);
+	background-origin: border-box;
+	background-clip: content-box, border-box;
+	font-weight:700;
+	color:var(--text);
+	font-size:1.05rem;
+}
+
+.brand strong{z-index:3;font-size:0.95rem;letter-spacing:2px;color:#ffffff;text-shadow:0 0 6px rgba(255,255,255,0.85)}
+
+.brand-container-stars{position:absolute;z-index:0;width:100%;height:100%;overflow:hidden;transition:0.5s;border-radius:inherit;backdrop-filter:blur(1rem);background-color:rgba(18,18,18,0.6)}
+.brand-stars{position:relative;background:transparent;width:200rem;height:200rem}
+.brand-stars::after{content:"";position:absolute;top:-10rem;left:-100rem;width:100%;height:100%;animation:animStarRotate 90s linear infinite;background-image:radial-gradient(#ffffff 1px, transparent 1%);background-size:50px 50px}
+.brand-stars::before{content:"";position:absolute;top:0;left:-50%;width:170%;height:500%;animation:animStar 60s linear infinite;background-image:radial-gradient(#ffffff 1px, transparent 1%);background-size:50px 50px;opacity:0.5}
+
+.brand-glow{position:absolute;display:flex;width:12rem;left:50%;top:50%;transform:translateX(-50%);z-index:0}
+.brand .circle{width:100%;height:30px;filter:blur(2rem);animation:pulse_3011 4s infinite;z-index:0}
+.brand .circle:nth-of-type(1){background:rgba(254,83,186,0.636)}
+.brand .circle:nth-of-type(2){background:rgba(142,81,234,0.704)}
+
+.brand:hover{transform:scale(1.06)}
+.brand:active{border:double 3px #fe53bb;background-origin:border-box;background-clip:content-box,border-box;animation:none}
+.brand:active .circle{background:#fe53bb}
+
+@keyframes animStar{from{transform:translateY(0)}to{transform:translateY(-135rem)}}
+@keyframes animStarRotate{from{transform:rotate(360deg)}to{transform:rotate(0)}}
+@keyframes gradient_301{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes pulse_3011{0%{transform:scale(0.75);box-shadow:0 0 0 0 rgba(0,0,0,0.7)}70%{transform:scale(1);box-shadow:0 0 0 10px rgba(0,0,0,0)}100%{transform:scale(0.75);box-shadow:0 0 0 0 rgba(0,0,0,0)}}
+
+@media (prefers-reduced-motion: reduce){
+	.brand, .brand .circle, .brand-stars::after, .brand-stars::before{animation:none!important;transition:none!important}
+}
+/* Glowy effect for each nav link (pseudo-element behind the link) */
+.nav-links a{
+	position:relative;
+ 	display:inline-block;
+	padding:0.18rem 0.36rem; /* smaller padding */
+	white-space:nowrap; /* prevent link text wrapping which can push the navbar to a new line */
+ 	border-radius:6px;
+ 	color:var(--muted);
+ 	font-weight:600;
+ 	font-size:0.95rem; /* slightly smaller */
+ 	line-height:1;
+ 	z-index:1; /* stay above the glow */
+ 	text-decoration:none;
+}
+.nav-links a::before{
+	content: "";
+	position:absolute;
+	left:50%;
+	top:50%;
+	transform:translate(-50%,-50%);
+	width:calc(100% + 18px);
+	height:calc(100% + 10px);
+	border-radius:10px;
+	background: linear-gradient(90deg, rgba(124,58,237,0.9), rgba(6,182,212,0.9));
+	z-index:-1;
+	filter:blur(0px);
+	opacity:0.7;
+	transition:filter 320ms ease, opacity 320ms ease, transform 320ms ease;
+	pointer-events:none;
+	mix-blend-mode: screen;
+}
+.nav-links a:hover::before,
+.nav-links a:focus::before{
+	filter:blur(10px);
+	opacity:1;
+	transform:translate(-50%,-50%) scale(1.02);
+}
+.nav-links a:active::before{filter:blur(4px);opacity:0.9}
+.nav-links a:hover, .nav-links a:focus{color:var(--text)}
+
+/* Active link styling: underline + distinct glow color */
+.nav-links a.active{
+	color:var(--text);
+}
+.nav-links a.active::after{
+	content: "";
+	position: absolute;
+	left: 50%;
+	bottom: -6px;
+	transform: translateX(-50%);
+	width: 60%;
+	height: 2px;
+	background: linear-gradient(90deg, var(--accent), var(--accent-2));
+	border-radius: 2px;
+	opacity: 0.95;
+}
+.nav-links a.active::before{
+	/* stronger/different glow for active link */
+	background: linear-gradient(90deg, rgba(124,58,237,1), rgba(6,182,212,1));
+	filter: blur(14px);
+	opacity:1;
+	transform:translate(-50%,-50%) scale(1.05);
+}
+
+/* Smooth scrolling for anchor links */
+html{scroll-behavior:smooth}
+
+/* Make the glow subtler on small screens */
+@media(max-width:700px){
+	/* reduce gap on narrow screens to avoid wrapping */
+	.nav-links{gap:1rem}
+	.nav-links a{font-size:0.92rem;padding:0.16rem 0.32rem}
+}
+
+@media(max-width:520px){
+	.nav-links a::before{width:calc(100% + 12px);height:calc(100% + 6px);filter:blur(6px)}
+	.nav-links a{font-size:0.9rem;padding:0.14rem 0.3rem}
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+	.nav-links a::before{filter:none;transition:none;opacity:0.6}
+}
+
+/* duplicate brand rule removed (see above) */
+
+/* Hero: two-column layout (left = intro, right = card) */
+#hero{min-height:60vh;padding:4rem 0}
+.hero-grid{display:grid;grid-template-columns:1fr 420px;gap:2rem;align-items:center}
+.hero-left{min-width:0}
+.hero-right{display:flex;align-items:center;justify-content:center;position:relative}
+.hero-right .uiverse-card{margin:0}
+#hero h1{font-size:clamp(1.6rem,4vw,2.8rem);margin:0 0 0.5rem}
+#hero p{color:var(--muted);max-width:60ch;margin:0 0 1rem}
+
+@media(max-width:900px){
+	.hero-grid{grid-template-columns:1fr;gap:1rem}
+	.hero-right{order:2}
+	.hero-left{order:1}
+	.hero-right .uiverse-card{width:320px;height:300px}
+}
+
+/* Typewriter effect for the name */
+.typewriter{display:inline-block;vertical-align:middle}
+.type-text{display:inline-block;white-space:nowrap}
+.caret{display:inline-block;width:2px;height:1.1em;background:var(--text);margin-left:6px;vertical-align:middle;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px}
+
+@media (prefers-reduced-motion: reduce){
+	.caret{display:none;animation:none}
+}
+
+/* Sections */
+section{padding:3rem 0}
+section h2{margin:0 0 1rem;font-size:1.25rem}
+
+/* Projects grid */
+.projects-grid{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:var(--gap)}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:1rem;border-radius:var(--radius);box-shadow:0 6px 18px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+.card h3{margin:0 0 0.5rem}
+.card p{margin:0;color:var(--muted);font-size:0.95rem}
+
+/* About / contact small helpers */
+.two-col{display:grid;grid-template-columns:1fr;gap:1rem}
+.muted{color:var(--muted)}
+
+/* Footer */
+footer{border-top:1px solid rgba(255,255,255,0.03);padding:2rem 0;text-align:center;color:var(--muted)}
+
+/* Utility */
+.stack{display:flex;gap:0.75rem;flex-wrap:wrap}
+
+/* Responsive */
+@media(min-width:700px){
+	.projects-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+	.two-col{grid-template-columns:1fr 320px}
+}
+@media(min-width:1100px){
+	.projects-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+
+/* Carousel styles */
+.carousel{position:relative;margin-top:1rem}
+.carousel-viewport{overflow:hidden;border-radius:12px}
+.carousel-track{display:flex;transition:transform 450ms cubic-bezier(.2,.9,.2,1)}
+.slide{min-width:100%;padding:1rem}
+.slide-content{min-height:220px;display:flex;flex-direction:column;gap:0.75rem}
+.slide .thumb{height:140px;border-radius:8px;background-size:cover;background-position:center}
+.carousel-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.04);color:var(--text);width:44px;height:44px;border-radius:999px;display:grid;place-items:center;cursor:pointer}
+.carousel-btn.prev{left:12px}
+.carousel-btn.next{right:12px}
+.carousel-btn:focus{outline:3px solid color-mix(in srgb,var(--accent) 30%, transparent);outline-offset:4px}
+.carousel-dots{display:flex;gap:0.5rem;justify-content:center;margin-top:0.75rem}
+.carousel-dots .dot{width:10px;height:10px;border-radius:999px;background:rgba(255,255,255,0.12);border:none;cursor:pointer}
+.carousel-dots .dot[aria-selected="true"]{background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 6px 18px rgba(124,58,237,0.12)}
+
+/* Responsive tweaks */
+@media(min-width:700px){
+	.slide-content{min-height:260px}
+	.slide .thumb{height:180px}
+}
+
+/* Reduce motion: remove transform transitions and autoplay on reduced motion */
+@media (prefers-reduced-motion: reduce){
+	.carousel-track{transition:none}
+	.carousel-btn{transition:none}
+}
+
+/* Accessibility: focus states for interactive elements */
+button, a{transition:all 180ms cubic-bezier(.2,.9,.2,1)}
+a:focus, button:focus{box-shadow:0 0 0 4px rgba(124,58,237,0.18);border-radius:6px}
+
+/* About: vertical timeline */
+.timeline{position:relative;padding:1rem 0 0 0;display:flex;flex-direction:column;gap:1.25rem}
+.timeline::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));transform:translateX(-50%);pointer-events:none;z-index:1}
+.timeline-item{display:grid;grid-template-columns:1fr 48px 1fr;gap:1rem;align-items:center;padding:0.5rem 0}
+.timeline-left{padding-right:1rem;text-align:left;overflow-wrap:break-word;max-width:calc(50% - 64px)}
+
+/* nudge left content slightly toward the spine without crossing it */
+@media(min-width:700px){
+	/* center-align left column content visually while keeping it left of the spine; nudge closer */
+	.timeline-left{transform:translateX(44px);max-width:calc(50% - 24px);text-align:center}
+}
+
+@media (prefers-reduced-motion: reduce){
+	.timeline-left{transform:none}
+}
+.timeline-left h3{margin:0 0 0.35rem;font-size:1rem}
+.timeline-left p{margin:0;color:var(--muted);font-size:0.95rem}
+.timeline-center{display:flex;justify-content:center;align-items:flex-start}
+.timeline-center .dot{width:14px;height:14px;border-radius:50%;background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 6px 18px rgba(124,58,237,0.12);border:3px solid rgba(8,7,18,0.6);z-index:3;transition:transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms}
+
+/* subtle pulse on hover / focus (respect reduced motion) */
+@keyframes dot-pulse{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+.timeline-center .dot:hover,
+.timeline-center .dot:focus{
+	animation: dot-pulse 900ms ease-in-out 1;
+	box-shadow:0 10px 28px rgba(124,58,237,0.18);
+}
+@media (prefers-reduced-motion: reduce){
+	.timeline-center .dot{transition:none;animation:none}
+}
+.timeline-right{min-width:80px;text-align:left;padding-left:0.5rem;align-self:center}
+.timeline-right time{display:inline-block;color:var(--muted);font-weight:600}
+
+@media(max-width:900px){
+	.timeline{padding-left:1rem;padding-right:1rem}
+	.timeline::before{left:28px}
+	/* two-column: small dot column then content; dates flow under content */
+	.timeline-item{grid-template-columns:40px 1fr;gap:0.75rem}
+	.timeline-center{order:0}
+	.timeline-right{order:2;min-width:auto;padding-left:0;margin-top:0.25rem;text-align:left}
+	.timeline-left{grid-column:2 / span 1;padding-right:0;text-align:left}
+}
+
+@media(max-width:520px){
+	/* Stack: content then date; hide center spine for small screens */
+	.timeline{gap:1rem}
+	.timeline::before{display:none}
+	.timeline-item{grid-template-columns:1fr;align-items:baseline}
+	.timeline-center{display:none}
+	.timeline-right{order:2;margin-top:0.5rem;text-align:left}
+}
+
+/* Small print for reduced motion */
+@media (prefers-reduced-motion: reduce){
+	*{transition:none!important}
+}
+
+/* From Uiverse.io by ilkhoeri — namespaced as .uiverse-card to avoid conflicts with existing .card */
+.uiverse-card{
+	--border: 4px;
+	--rounded: 16px;
+	--w-card: 450px;
+	--h-card: 400px;
+	margin: 0.85rem 0 0 0;
+	width: var(--w-card);
+	height: var(--h-card);
+	max-width: 80%;
+	max-height: 80%;
+	border-radius: var(--rounded);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	padding: var(--border);
+}
+.uiverse-card::before,
+.uiverse-card::after{
+	content: "";
+	z-index: -1;
+	position: absolute;
+	will-change: auto;
+	--size: calc(100%);
+	width: var(--size);
+	height: var(--size);
+	border-radius: var(--rounded);
+	background-size: 400% 400%;
+	animation: uiv-bg-spin 3s linear 0s infinite normal none running;
+	background-image: radial-gradient(circle farthest-side at 0 100%, #00ccb1, transparent), radial-gradient(circle farthest-side at 100% 0, #5ddcff, transparent), radial-gradient(circle farthest-side at 100% 100%, #3c67e3, transparent), radial-gradient(circle farthest-side at 0 0, #4e00c2, #0000);
+}
+.uiverse-card::after{
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 0.5s;
+	animation-delay: 0.5s;
+	filter: blur(24px);
+	opacity: 0.7;
+}
+@keyframes uiv-bg-spin{
+	25%{background-position: right 20% bottom 40%;}
+	75%{background-position: left 45% top 20%;}
+}
+.uiverse-points_wrapper{
+	position: absolute;
+	overflow: hidden;
+	width: calc(100% - (var(--border) * 4));
+	height: calc(100% - (var(--border) * 4));
+	border-radius: calc(var(--rounded) - 4px);
+	pointer-events: none;
+	z-index: 80;
+}
+.uiverse-point{
+	--sz-point: 4px;
+	top: -8px;
+	position: absolute;
+	animation: uiv-floating-points infinite ease-in-out;
+	pointer-events: none;
+	width: var(--sz-point);
+	height: var(--sz-point);
+	background-color: #5ddcff;
+	border-radius: 9999px;
+}
+@keyframes uiv-floating-points{
+	0%{transform:translate(0,0)}
+	95%{opacity:0}
+	100%{opacity:0;transform:translate(calc(var(--h-card) / 1.75), calc(var(--h-card) / 1.5))}
+}
+.uiverse-point:nth-child(1){left:10%;opacity:1;animation-duration:2.35s;animation-delay:0.2s}
+.uiverse-point:nth-child(2){left:30%;opacity:0.7;animation-duration:2.5s;animation-delay:0.5s}
+.uiverse-point:nth-child(3){left:25%;opacity:0.8;animation-duration:2.2s;animation-delay:0.1s}
+.uiverse-point:nth-child(4){left:44%;opacity:0.6;animation-duration:2.05s}
+.uiverse-point:nth-child(5){left:50%;opacity:1;animation-duration:1.9s}
+.uiverse-point:nth-child(6){left:75%;opacity:0.5;animation-duration:1.5s;animation-delay:1.5s}
+.uiverse-point:nth-child(7){left:88%;opacity:0.9;animation-duration:2.2s;animation-delay:0.2s}
+.uiverse-point:nth-child(8){left:58%;opacity:0.8;animation-duration:2.25s;animation-delay:0.2s}
+.uiverse-point:nth-child(9){left:98%;opacity:0.6;animation-duration:2.6s;animation-delay:0.1s}
+.uiverse-point:nth-child(10){left:65%;opacity:1;animation-duration:2.5s;animation-delay:0.2s}
+.uiverse-content{
+	position:absolute;
+	width: calc(100% - (var(--border) * 4));
+	height: calc(100% - (var(--border) * 4));
+	border-radius: calc(var(--rounded) - 4px);
+	overflow:hidden;
+	z-index:7;
+	background-color: #191c29;
+	/* make this a positioned container for the portrait */
+}
+
+/* Portrait sits inside the uiverse content and is centered absolutely so the card background remains visible around it */
+.uiverse-content .portrait{
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	display: block;
+	width: 58%;
+	max-width: 260px;
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+	border-radius: 14px;
+	box-shadow: 0 12px 30px rgba(2,6,23,0.6);
+	border: 4px solid rgba(255,255,255,0.04);
+	background-color: rgba(0,0,0,0.18);
+	pointer-events: none; /* let clicks pass to the card */
+}
+
+@media (max-width: 900px){
+	.uiverse-content .portrait{ width: 56%; max-width: 220px; }
+}
+
+@media (max-width: 520px){
+	.uiverse-content .portrait{ width: 48%; max-width: 180px; border-radius:12px }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+	.uiverse-card::before, .uiverse-card::after, .uiverse-point{animation:none!important;transition:none!important;}
+	.uiverse-card::after{filter:none;opacity:0.5}
+}
+
+/* Contact section: two-column layout (left = decorative spinner, right = contact card) */
+.contact-grid{display:grid;grid-template-columns:340px 1fr;gap:1.5rem;align-items:center;margin-top:0.5rem}
+.contact-left{display:flex;align-items:center;justify-content:center;padding:0.5rem;position:relative}
+.contact-right{display:flex;align-items:center}
+.contact-card{padding:1.25rem;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 10px 28px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+.contact-card h3{margin:0 0 0.5rem}
+.contact-card .small{font-size:0.85rem;margin-top:0.75rem}
+.contact-list{list-style:none;padding:0;margin:1rem 0 0 0;display:flex;flex-direction:column;gap:0.6rem}
+.contact-list li{margin:0}
+.contact-link{display:inline-flex;align-items:center;gap:0.75rem;padding:0.5rem 0.6rem;border-radius:10px;color:var(--text);text-decoration:none;transition:transform 180ms ease, box-shadow 220ms ease, background 220ms ease}
+.contact-link svg{display:block;flex-shrink:0;color:var(--accent)}
+.contact-text{font-weight:600;color:var(--text)}
+.contact-link:hover,.contact-link:focus{transform:translateY(-3px);box-shadow:0 10px 30px rgba(124,58,237,0.12);background:linear-gradient(90deg, rgba(124,58,237,0.06), rgba(6,182,212,0.04));outline:none}
+.contact-link:active{transform:translateY(-1px)}
+
+.contact-right .muted{margin-top:0.5rem}
+
+@media(max-width:900px){
+	.contact-grid{grid-template-columns:1fr;gap:1rem}
+	.contact-left{order:1}
+	.contact-right{order:2}
+	.contact-left{padding:0}
+}
+
+/* From Uiverse.io by SelfMadeSystem */
+/*
+Inspired by www.doi.org
+More comprehensive version at shenanigans.shoghisimon.ca/collection/spinning-numbers/
+ */
+
+	.spinning-number {
+		position: relative;
+		/* slightly larger than designer default for better visibility */
+		font-size: 0.7em;
+		transition: transform 240ms ease;
+	}
+
+/* allow the spinner to scale down on smaller screens while keeping a vertical offset */
+@media (max-width: 900px) {
+	.spinning-number {
+		width: 360px;
+		height: 360px;
+		font-size: 0.6em;
+		margin-top: 18px;
+	}
+	.contact-grid{grid-template-columns:1fr}
+}
+
+@media (max-width: 520px) {
+	/* On very small screens the contact section stacks; hide the heavy spinner */
+	.spinning-number {display:none}
+	.contact-grid{grid-template-columns:1fr}
+	.contact-left{pointer-events:none;padding:0}
+	.contact-right{justify-content:flex-start;padding-left:0}
+}
+
+.spinning-number .wheel {
+	animation: spinning-number-spin var(--t) linear infinite var(--r1);
+}
+
+@keyframes spinning-number-spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.spinning-number .number {
+	position: absolute;
+	transform: translate(-50%, -50%) rotate(var(--a))
+		translateY(calc(var(--l) * -1)) scale(var(--s));
+}
+
+.spinning-number .number::before {
+	content: "1";
+	--z: 1.9;
+	--r: normal;
+	transform: translate(-50%, -50%);
+	animation: spinning-number-changing calc(var(--t) * var(--z))
+		calc(-1 * var(--z) * var(--t) * var(--i) / var(--m) - 60s) linear infinite
+		var(--r);
+}
+
+@keyframes spinning-number-changing {
+	0% {
+		content: "1";
+	}
+	to {
+		content: "0";
+	}
+}
+
+/* Keep reduced-motion fallback */
+@media (prefers-reduced-motion: reduce){
+	.spinning-number .wheel{animation:none}
+	.spinning-number .number::before{animation:none}
+}
+
+/* Button styles for card actions */
+.card-actions{
+	display:flex;
+	gap:0.75rem;
+	margin-top:auto;
+	padding-top:0.5rem;
+}
+.btn{
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	padding:0.5rem 1rem;
+	border-radius:8px;
+	font-weight:600;
+	font-size:0.9rem;
+	text-decoration:none;
+	transition:all 180ms cubic-bezier(.2,.9,.2,1);
+	background:linear-gradient(90deg, var(--accent), var(--accent-2));
+	color:white;
+	border:none;
+	cursor:pointer;
+}
+.btn:hover,.btn:focus{
+	transform:translateY(-2px);
+	box-shadow:0 8px 24px rgba(124,58,237,0.25);
+}
+.btn.ghost{
+	background:transparent;
+	border:1px solid rgba(255,255,255,0.12);
+	color:var(--text);
+}
+.btn.ghost:hover,.btn.ghost:focus{
+	background:rgba(255,255,255,0.03);
+	border-color:rgba(255,255,255,0.2);
+	box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
